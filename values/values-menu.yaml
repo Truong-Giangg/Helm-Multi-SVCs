@@ -1,0 +1,44 @@
+replicaCount: 1
+
+image:
+  repository: meiot/hellomct-dotnet-menu
+  pullPolicy: IfNotPresent
+  tag: ""
+
+imagePullSecrets:
+- name: dockerhub-secret
+nameOverride: ""
+fullnameOverride: hellomct-menu
+
+service:
+  type: ClusterIP
+  port: 8080
+ingress:
+  enabled: true
+  className: nginx
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+  hosts:
+    - host: hellomct.meiot.live
+      paths:
+        - path: /menu(/|$)(.*)
+          pathType: ImplementationSpecific
+
+livenessProbe:
+  httpGet:
+    path: /
+    port: 8080
+readinessProbe:
+  httpGet:
+    path: /
+    port: 8080
+
+volumes:
+  - name: config-volume
+    configMap:
+      name: hellomct-menu-config
+
+volumeMounts:
+  - name: config-volume
+    mountPath: /app/appsettings.json
+    subPath: appsettings.json 
