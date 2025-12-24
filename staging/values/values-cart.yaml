@@ -1,0 +1,45 @@
+replicaCount: 1
+
+image:
+  repository: meiot/hellomct-dotnet-cart
+  pullPolicy: IfNotPresent
+  tag: ""
+
+imagePullSecrets:
+- name: dockerhub-secret
+nameOverride: ""
+fullnameOverride: hellomct-cart
+
+service:
+  type: ClusterIP
+  port: 8080
+ingress:
+  enabled: true
+  className: nginx
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+  hosts:
+    - host: hellomct.meiot.live
+      paths:
+        - path: /cart(/|$)(.*)
+          pathType: ImplementationSpecific
+
+livenessProbe:
+  httpGet:
+    path: /
+    port: 8080
+readinessProbe:
+  httpGet:
+    path: /
+    port: 8080
+
+volumes:
+  - name: config-volume
+    configMap:
+      name: hellomct-cart-config
+
+volumeMounts:
+  - name: config-volume
+    mountPath: /app/appsettings.json
+    subPath: appsettings.json 
+

@@ -1,0 +1,51 @@
+replicaCount: 1
+
+image:
+  repository: meiot/hellomct-dotnet
+  pullPolicy: IfNotPresent
+  tag: "1.1"
+
+imagePullSecrets:
+- name: dockerhub-secret
+nameOverride: ""
+fullnameOverride: hellomct-hello
+
+service:
+  type: ClusterIP
+  ports:
+    - name: http
+      port: 80
+      targetPort: 8080
+    - name: grpc
+      port: 50051
+      targetPort: 50051
+ingress:
+  enabled: true
+  className: nginx
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+  hosts:
+    - host: hellomct.meiot.live
+      paths:
+        - path: /hello(/|$)(.*)
+          pathType: ImplementationSpecific
+
+livenessProbe:
+  httpGet:
+    path: /
+    port: 8080
+readinessProbe:
+  httpGet:
+    path: /
+    port: 8080
+
+volumes:
+  - name: config-volume
+    configMap:
+      name: hellomct-hello-config
+
+volumeMounts:
+  - name: config-volume
+    mountPath: /app/appsettings.json
+    subPath: appsettings.json 
+
