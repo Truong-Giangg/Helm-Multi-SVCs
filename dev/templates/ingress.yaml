@@ -28,16 +28,14 @@ spec:
     - host: {{ .host | quote }}
       http:
         paths:
-          {{- range .paths }}
-          - path: {{ .path }}
-            {{- with .pathType }}
-            pathType: {{ . }}
-            {{- end }}
+          {{- range $.Values.service.ports }}
+          - path: /{{ .name }}
+            pathType: {{ default "Prefix" .pathType }}
             backend:
               service:
                 name: {{ include "hellomct.fullname" $ }}
                 port:
-                  number: {{ $.Values.service.port }}
+                  number: {{ .port }}
           {{- end }}
     {{- end }}
 {{- end }}
