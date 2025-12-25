@@ -29,7 +29,7 @@ spec:
       http:
         paths:
           {{- range $.Values.service.ports }}
-          - path: /{{ .name }}
+          - path: {{ .path }}
             pathType: {{ default "Prefix" .pathType }}
             backend:
               service:

@@ -32,9 +32,7 @@ service:
     - name: http
       port: 80
       targetPort: 8080
-    - name: grpc
-      port: 50051
-      targetPort: 50051
+      path: /hello(/|$)(.*)
 ingress:
   enabled: true
   className: nginx
@@ -42,9 +40,6 @@ ingress:
     nginx.ingress.kubernetes.io/rewrite-target: /$2
   hosts:
     - host: hellomct.meiot.live
-      paths:
-        - path: /hello(/|$)(.*)
-          pathType: ImplementationSpecific
 
 livenessProbe:
   httpGet:
